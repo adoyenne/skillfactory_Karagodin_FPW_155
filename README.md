@@ -1,2 +1,2 @@
-A simple and famous "X and O" game.
+A simple and famous "Tic Tac Toe" game.
 You can play it through the terminal.
