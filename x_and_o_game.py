@@ -9,19 +9,15 @@ def create_a_board(board):
 def check_if_move_is_correct(board, row, col):
     return 0 <= row < 3 and 0 <= col < 3 and board[row][col] == '-'
 
-def check_winner(board):
+def check_winner(board, symbol):
     # Проверка по горизонтали и вертикали:
     for i in range(3):
-        if all(cell == 'x' for cell in board[i]) or all(board[j][i] == 'x' for j in range(3)):
-            return 'x'
-        elif all(cell == 'o' for cell in board[i]) or all(board[j][i] == 'o' for j in range(3)):
-            return 'o'
+        if all(cell == symbol for cell in board[i]) or all(board[j][i] == symbol for j in range(3)):
+            return symbol
 
     # Проверка по диагоналям:
-    if all(board[i][i] == 'x' for i in range(3)) or all(board[i][2 - i] == 'x' for i in range(3)):
-        return 'x'
-    elif all(board[i][i] == 'o' for i in range(3)) or all(board[i][2 - i] == 'o' for i in range(3)):
-        return 'o'
+    if all(board[i][i] == symbol for i in range(3)) or all(board[i][2 - i] == symbol for i in range(3)):
+        return symbol
 
     return None
 
@@ -63,7 +59,7 @@ def play_x_and_o_game():
 
             if check_if_move_is_correct(board, row, col):
                 board[row][col] = current_player
-                winner = check_winner(board)
+                winner = check_winner(board, current_player)
 
                 if winner or check_if_board_is_full(board):
                     create_a_board(board)
