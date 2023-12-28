@@ -1,2 +1,2 @@
-The simple "x and o" game. 
-Can be played using terminal.
+A simple and famous game "X and O".
+You can play it through the terminal.
