@@ -1,16 +1,13 @@
-# Game: Sea Battle
+# Application: Sea Battle
 ############################################################
 
 import random
-from enum import Enum
-
-
-class Direction(Enum):
-    HORIZONTAL = "horizontal"
-    VERTICAL = "vertical"
 
 
 class Coordinate:
+    HORIZONTAL = "horizontal"
+    VERTICAL = "vertical"
+
     def __init__(self, row, col):
         self.row = row
         self.col = col
@@ -28,9 +25,13 @@ class Ship:
 
 
 class Board:
+
+    BOARD_SIZE = 6
+
     def __init__(self):
         self.ships = []
-        self.grid = [[Coordinate(row, col) for col in range(1, 7)] for row in range(1, 7)]
+        self.grid = [[Coordinate(row, col) for col in range(1, self.BOARD_SIZE + 1)] for row in
+                     range(1, self.BOARD_SIZE + 1)]
         self.computer_shots = set()
         self.place_ships()
         self.player_ships_sunk = 0
@@ -44,10 +45,10 @@ class Board:
             self.place_ship(length)
 
     def generate_ship_coordinates(self, length):
-        start_row, start_col = random.randint(1, 6), random.randint(1, 6)
-        direction = random.choice(list(Direction))
+        start_row, start_col = random.randint(1, self.BOARD_SIZE), random.randint(1, self.BOARD_SIZE)
+        direction = random.choice([Coordinate.HORIZONTAL, Coordinate.VERTICAL])
 
-        if direction == Direction.HORIZONTAL:
+        if direction == Coordinate.HORIZONTAL:
             ship_coordinates = [Coordinate(start_row, start_col + i) for i in range(length)]
         else:
             ship_coordinates = [Coordinate(start_row + i, start_col) for i in range(length)]
@@ -64,11 +65,21 @@ class Board:
 
         for coord in ship_coordinates:
             if (
-                    not (1 <= coord.row <= 6)
-                    or not (1 <= coord.col <= 6)
+                    not (1 <= coord.row <= self.BOARD_SIZE)
+                    or not (1 <= coord.col <= self.BOARD_SIZE)
                     or (coord.row, coord.col) in occupied_coordinates
             ):
                 return False
+
+        # Additional check for minimum distance between ships
+
+        for ship_coord in occupied_coordinates:
+            for coord in ship_coordinates:
+                if (
+                        abs(ship_coord[0] - coord.row) <= 1
+                        and abs(ship_coord[1] - coord.col) <= 1
+                ):
+                    return False
 
         return True
 
@@ -95,10 +106,10 @@ class Board:
         return " O |"  # Display "O" for empty spaces
 
     def display(self, show_ships=False):
-        print("  | 1 | 2 | 3 | 4 | 5 | 6 |")
-        for row in range(1, 7):
+        print("  |", " | ".join(str(i) for i in range(1, self.BOARD_SIZE + 1)), "|")
+        for row in range(1, self.BOARD_SIZE + 1):
             row_str = f"{row} |"
-            for col in range(1, 7):
+            for col in range(1, self.BOARD_SIZE + 1):
                 coord = self.grid[row - 1][col - 1]
                 row_str += self.display_result(coord, show_ships)
 
@@ -109,7 +120,6 @@ class Board:
 
         if coord.is_hit or coord.is_missed:  # Check for both is_hit and is_missed
             raise ValueError("These coordinates are already taken, make a move again!")
-
 
         if is_computer:
             self.computer_shots.add((row, col))
@@ -139,19 +149,19 @@ class Board:
             return total_hits == sum(len(ship.coordinates) for ship in self.ships) and self.computer_ships_sunk == 0
 
 
-
 def get_user_input():
     try:
-        row = int(input("Enter the row (1-6) for your shot: "))
-        col = int(input("Enter the column (1-6) for your shot: "))
-        if 1 <= row <= 6 and 1 <= col <= 6:
+        row = int(input(f"Enter the row (1-{Board.BOARD_SIZE}) for your shot: "))
+        col = int(input(f"Enter the column (1-{Board.BOARD_SIZE}) for your shot: "))
+        if 1 <= row <= Board.BOARD_SIZE and 1 <= col <= Board.BOARD_SIZE:
             return row, col
         else:
-            print("Invalid input. Row and column values must be between 1 and 6.")
+            print(f"Invalid input. Row and column values must be between 1 and {Board.BOARD_SIZE}.")
             return get_user_input()
     except ValueError:
         print("Invalid input. Please enter correct integer values.")
         return get_user_input()
+
 
 def main():
     player_board = Board()
@@ -168,7 +178,7 @@ def main():
 
         try:
             hit = computer_board.take_shot(row, col)
-        except InvalidMoveError as e:
+        except ValueError as e:
             print(e)
             continue
 
@@ -176,21 +186,6 @@ def main():
             print("Player hits at", row, col)
         else:
             print("Player misses at", row, col)
-
-        computer_row, computer_col = random.randint(1, 6), random.randint(1, 6)
-
-        while (computer_row, computer_col) in player_board.computer_shots:
-            computer_row, computer_col = random.randint(1, 6), random.randint(1, 6)
-
-        try:
-            hit = player_board.take_shot(computer_row, computer_col, is_computer=True)
-        except InvalidMoveError:
-            continue
-
-        if hit:
-            print("Computer hits at", computer_row, computer_col)
-        else:
-            print("Computer misses at", computer_row, computer_col)
 
         if computer_board.all_ships_sunk(is_computer=True):
             print("\nPlayer's Board:")
@@ -201,7 +196,24 @@ def main():
 
             print("Congratulations! You've won!")
             break
-        elif player_board.all_ships_sunk(is_computer=False):
+
+        computer_row, computer_col = random.randint(1, Board.BOARD_SIZE), random.randint(1, Board.BOARD_SIZE)
+
+        while (computer_row, computer_col) in player_board.computer_shots:
+            computer_row, computer_col = random.randint(1, Board.BOARD_SIZE), random.randint(1, Board.BOARD_SIZE)
+
+        try:
+            hit = player_board.take_shot(computer_row, computer_col, is_computer=True)
+        except ValueError:
+            continue
+
+        if hit:
+            print("Computer hits at", computer_row, computer_col)
+        else:
+            print("Computer misses at", computer_row, computer_col)
+
+        if player_board.all_ships_sunk(is_computer=False):
+
             print("\nPlayer's Board:")
             player_board.display(show_ships=True)
 
@@ -210,6 +222,7 @@ def main():
 
             print("Sorry, you've lost. Try again!")
             break
+
 
 if __name__ == "__main__":
     main()
