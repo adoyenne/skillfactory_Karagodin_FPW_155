@@ -192,7 +192,7 @@ def main():
             player_board.display(show_ships=True)
 
             print("\nComputer's Board:")
-            computer_board.display(show_ships=True)
+            computer_board.display(show_ships=False)
 
             print("Congratulations! You've won!")
             break
