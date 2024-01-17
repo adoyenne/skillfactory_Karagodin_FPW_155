@@ -4,5 +4,5 @@ You can play it through the terminal.
 2. "Sea Battle" game.
 You can play it through the terminal.
 Caution: if code is stack it means that
-program has problems in random procedure to place ahips on board,
-so just lanch it again or increase a board size
+the program has problems in random procedure to place ships on game board,
+so just relaunch it again or launch with increased board size
