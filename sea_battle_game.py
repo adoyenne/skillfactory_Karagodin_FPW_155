@@ -45,15 +45,20 @@ class Board:
             self.place_ship(length)
 
     def generate_ship_coordinates(self, length):
-        start_row, start_col = random.randint(1, self.BOARD_SIZE), random.randint(1, self.BOARD_SIZE)
-        direction = random.choice([Coordinate.HORIZONTAL, Coordinate.VERTICAL])
+        max_attempts = 100  # the number of attempts
+        for _ in range(max_attempts):
+            start_row, start_col = random.randint(1, self.BOARD_SIZE), random.randint(1, self.BOARD_SIZE)
+            direction = random.choice([Coordinate.HORIZONTAL, Coordinate.VERTICAL])
 
-        if direction == Coordinate.HORIZONTAL:
-            ship_coordinates = [Coordinate(start_row, start_col + i) for i in range(length)]
-        else:
-            ship_coordinates = [Coordinate(start_row + i, start_col) for i in range(length)]
+            if direction == Coordinate.HORIZONTAL:
+                ship_coordinates = [Coordinate(start_row, start_col + i) for i in range(length)]
+            else:
+                ship_coordinates = [Coordinate(start_row + i, start_col) for i in range(length)]
 
-        return ship_coordinates
+            if self.is_valid_ship_placement(ship_coordinates):
+                return ship_coordinates
+
+        raise ValueError("Unable to find valid coordinates for the ship. Reduce ship density or increase board size.")
 
     # Check if we can place a ship at chosen coordinates, if not then choose coordinates again
     def is_valid_ship_placement(self, ship_coordinates):
