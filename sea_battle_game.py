@@ -177,45 +177,49 @@ def main():
         player_board.display(show_ships=True)
 
         print("\nComputer's Board:")
-        computer_board.display(show_ships=True)
+        computer_board.display(show_ships=False)
 
-        row, col = get_user_input()
+        while True:
+            row, col = get_user_input()
 
-        try:
-            hit = computer_board.take_shot(row, col)
-        except ValueError as e:
-            print(e)
-            continue
+            try:
+                hit = computer_board.take_shot(row, col)
+            except ValueError as e:
+                print(e)
+                continue
 
-        if hit:
-            print("Player hits at", row, col)
-        else:
-            print("Player misses at", row, col)
+            if hit:
+                print("Player hits at", row, col)
+            else:
+                print("Player misses at", row, col)
+                break  # Break out of the loop if the player misses
 
         if computer_board.all_ships_sunk(is_computer=True):
             print("\nPlayer's Board:")
             player_board.display(show_ships=True)
 
             print("\nComputer's Board:")
-            computer_board.display(show_ships=False)
+            computer_board.display(show_ships=True)
 
             print("Congratulations! You've won!")
             break
 
-        computer_row, computer_col = random.randint(1, Board.BOARD_SIZE), random.randint(1, Board.BOARD_SIZE)
-
-        while (computer_row, computer_col) in player_board.computer_shots:
+        while True:
             computer_row, computer_col = random.randint(1, Board.BOARD_SIZE), random.randint(1, Board.BOARD_SIZE)
 
-        try:
-            hit = player_board.take_shot(computer_row, computer_col, is_computer=True)
-        except ValueError:
-            continue
+            while (computer_row, computer_col) in player_board.computer_shots:
+                computer_row, computer_col = random.randint(1, Board.BOARD_SIZE), random.randint(1, Board.BOARD_SIZE)
 
-        if hit:
-            print("Computer hits at", computer_row, computer_col)
-        else:
-            print("Computer misses at", computer_row, computer_col)
+            try:
+                hit = player_board.take_shot(computer_row, computer_col, is_computer=True)
+            except ValueError:
+                continue
+
+            if hit:
+                print("Computer hits at", computer_row, computer_col)
+            else:
+                print("Computer misses at", computer_row, computer_col)
+                break # Break out of the loop if the computer misses
 
         if player_board.all_ships_sunk(is_computer=False):
 
