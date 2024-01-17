@@ -189,6 +189,13 @@ def main():
                 continue
 
             if hit:
+
+                print("\nPlayer's Board:")
+                player_board.display(show_ships=True)
+
+                print("\nComputer's Board:")
+                computer_board.display(show_ships=False)
+            
                 print("Player hits at", row, col)
             else:
                 print("Player misses at", row, col)
@@ -216,6 +223,13 @@ def main():
                 continue
 
             if hit:
+
+                print("\nPlayer's Board:")
+                player_board.display(show_ships=True)
+
+                print("\nComputer's Board:")
+                computer_board.display(show_ships=False)
+            
                 print("Computer hits at", computer_row, computer_col)
             else:
                 print("Computer misses at", computer_row, computer_col)
